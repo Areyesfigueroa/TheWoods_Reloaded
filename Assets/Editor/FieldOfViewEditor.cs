@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 using UnityEditor;
+using TheWoods.AI;
 
 [CustomEditor(typeof(FieldOfView))]
 public class FieldOfViewEditor : Editor {

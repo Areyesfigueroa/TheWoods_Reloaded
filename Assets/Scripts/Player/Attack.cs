@@ -1,16 +1,22 @@
 ﻿using UnityEngine;
 using System.Collections;
+using TheWoods.Audio;
+using TheWoods.Manager;
 
-public class Attack : MonoBehaviour {
-
-    void OnTriggerEnter2D(Collider2D other)
+namespace TheWoods.Player
+{
+    public class Attack : MonoBehaviour
     {
-        if (other.tag == "Enemy")
+
+        void OnTriggerEnter2D(Collider2D other)
         {
-            Debug.Log("Working");
-            PlayerManager.Instance.PeopleKilled++;
-            AudioEventSystem.EnemyCapture();
-            Destroy(other.gameObject, .2f);
+            if (other.tag == "Enemy")
+            {
+                Debug.Log("Working");
+                PlayerManager.Instance.PeopleKilled++;
+                AudioEventSystem.EnemyCapture();
+                Destroy(other.gameObject, .2f);
+            }
         }
     }
 }

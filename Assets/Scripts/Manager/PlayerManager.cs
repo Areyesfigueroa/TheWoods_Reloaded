@@ -1,57 +1,62 @@
 ﻿using UnityEngine;
 using System.Collections;
+using TheWoods.Player;
 
-public class PlayerManager : MonoBehaviour {
-
-    public static PlayerManager Instance { get { return instance; } } //getter for instance
-    static protected PlayerManager instance; //declaring instance variable
-
-    private bool isDead = false;
-    public float playerMaxSpeed = 10;
-    public Animator anim;
-
-    //keep track of the people collected
-    private int peopleKilled;
-    public int PeopleKilled
+namespace TheWoods.Manager
+{
+    public class PlayerManager : MonoBehaviour
     {
-        get { return peopleKilled; }
-        set { peopleKilled = value; }
-    }
 
-    void Start()
-    {
-        peopleKilled = 0;
-    } 
+        public static PlayerManager Instance { get { return instance; } } //getter for instance
+        static protected PlayerManager instance; //declaring instance variable
 
-    void Awake()
-    {
-        if (instance != null)
+        private bool isDead = false;
+        public float playerMaxSpeed = 10;
+        public Animator anim;
+
+        //keep track of the people collected
+        private int peopleKilled;
+        public int PeopleKilled
         {
-            Debug.LogWarning("There is alreade a PlayerManager in play. Deleting old, instantiating new");
-            Destroy(PlayerManager.Instance.gameObject);
-            instance = null;
+            get { return peopleKilled; }
+            set { peopleKilled = value; }
         }
-        else
+
+        void Start()
         {
-            instance = this;
+            peopleKilled = 0;
         }
-    }
 
-    void Update()
-    {
-        anim.SetBool("isDead", isDead);
-        anim.SetFloat("Speed", Mathf.Abs(Player.Instance.Velocity.x) / playerMaxSpeed);
-
-		if (Input.GetKeyDown(KeyCode.LeftShift) || Input.GetKeyDown(KeyCode.RightShift))
+        void Awake()
         {
-            Attack();
+            if (instance != null)
+            {
+                Debug.LogWarning("There is alreade a PlayerManager in play. Deleting old, instantiating new");
+                Destroy(PlayerManager.Instance.gameObject);
+                instance = null;
+            }
+            else
+            {
+                instance = this;
+            }
         }
-    }
 
-    void Attack()
-    {
-        anim.SetTrigger("Attack");
-//		AkSoundEngine.PostEvent ("Collection", gameObject);
-    }
+        void Update()
+        {
+            anim.SetBool("isDead", isDead);
+            anim.SetFloat("Speed", Mathf.Abs(Player.PlayerController.Instance.Velocity.x) / playerMaxSpeed);
 
+            if (Input.GetKeyDown(KeyCode.LeftShift) || Input.GetKeyDown(KeyCode.RightShift))
+            {
+                Attack();
+            }
+        }
+
+        void Attack()
+        {
+            anim.SetTrigger("Attack");
+            //		AkSoundEngine.PostEvent ("Collection", gameObject);
+        }
+
+    }
 }

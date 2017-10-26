@@ -7,8 +7,10 @@ using System.Collections;
 /// Triggers have already been placed, just excute audio on the functions given for the events
 /// </summary>
 
-public class AudioEventControl : MonoBehaviour
-{/*
+namespace TheWoods.Audio
+{
+    public class AudioEventControl : MonoBehaviour
+    {/*
 
     //Prevents audio override
     public bool playAudio = true;
@@ -350,4 +352,5 @@ public class AudioEventControl : MonoBehaviour
 
     #endregion
     */
+    }
 }
