@@ -1,22 +1,64 @@
-﻿using UnityEngine;
-using System.Collections;
-using TheWoods.Audio;
-using TheWoods.Manager;
+﻿using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
 
-namespace TheWoods.Player
+public interface IAttack
 {
-    public class Attack : MonoBehaviour
-    {
+    void AttackSpriteFlip();
+}
 
-        void OnTriggerEnter2D(Collider2D other)
+public class Attack: MonoBehaviour, IAttack {
+
+    //Direction
+    SpriteRenderer sprite;
+
+    //Attack Triggers
+    public GameObject attackLeft, attackRight;
+
+    //Attack Settings
+    public float attackCoolDown;
+
+    /// <summary>
+    /// Activates and Plays Attack animation and trigger in the correct direction.
+    /// </summary>
+    public void AttackSpriteFlip()
+    {
+        if (!sprite.flipX) //facing right
         {
-            if (other.tag == "Enemy")
-            {
-                Debug.Log("Working");
-                PlayerManager.Instance.PeopleKilled++;
-                AudioEventSystem.EnemyCapture();
-                Destroy(other.gameObject, .2f);
-            }
+            AttackTriggerEnable(AttackDirection.RIGHT);
+        }
+        else
+        {
+            AttackTriggerEnable(AttackDirection.LEFT);
         }
     }
+
+    void AttackTriggerEnable(AttackDirection dir)
+    {
+        if(dir == AttackDirection.LEFT)
+        {
+            attackLeft.SetActive(true);
+        }
+        else
+        {
+            attackRight.SetActive(true);
+        }
+
+        //Activate cooldown
+        StartCoroutine(AttackTriggerCooldown(attackCoolDown));
+    }
+
+    IEnumerator AttackTriggerCooldown(float time)
+    {
+        yield return new WaitForSeconds(time);
+        attackRight.SetActive(false);
+        attackLeft.SetActive(false);
+    }
+
+    public enum AttackDirection
+    {
+        RIGHT,
+        LEFT
+    }
+
 }

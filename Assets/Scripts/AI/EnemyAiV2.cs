@@ -67,7 +67,7 @@ namespace TheWoods.AI
             }
             else
             {
-                Debug.Log("Default is right direction");
+                //Debug.Log("Default is right direction");
                 startRight = true;
                 rotRight = 180f; //right
             }
@@ -92,7 +92,7 @@ namespace TheWoods.AI
         //Delay time for when you reach maxLeft or maxRight
         IEnumerator Delay(float delay)
         {
-            Debug.Log("Coroutine Start: ");
+            //Debug.Log("Coroutine Start: ");
 
             //Play the Idle Sound, There is no idle animation
             //        AudioEventSystem.EnemyIdle();
@@ -121,7 +121,7 @@ namespace TheWoods.AI
                 SwitchLerping(rightDir);
             }
 
-            Debug.Log("Coroutine End: ");
+            //Debug.Log("Coroutine End: ");
         }
 
         #endregion
@@ -146,7 +146,7 @@ namespace TheWoods.AI
                 if (Mathf.Clamp01(percentageComplete) >= 1 && triggerRightPosDelay) //works
                 {
                     isLerpingRight = false;
-                    Debug.Log("Reached Max Position");
+                    //Debug.Log("Reached Max Position");
                     StartCoroutine(Delay(rightPosDelay));
                 }
                 else if (Mathf.Clamp01(percentageComplete) >= 1 && !triggerRightPosDelay)
@@ -176,13 +176,13 @@ namespace TheWoods.AI
 
                 if (Mathf.Clamp01(percentageComplete) >= 1 && triggerLeftPosDelay)
                 {
-                    Debug.Log("Reached Min Position");
+                    //Debug.Log("Reached Min Position");
                     isLerpingLeft = false;
                     StartCoroutine(Delay(leftPosDelay));
                 }
                 else if (Mathf.Clamp01(percentageComplete) >= 1 && !triggerLeftPosDelay)
                 {
-                    Debug.Log("Reached Min Pos");
+                    //Debug.Log("Reached Min Pos");
                     isLerpingLeft = false;
                     if (startLeft) //if you started on the left
                     {

@@ -1,24 +1,28 @@
 ﻿using UnityEngine;
 using System.Collections;
+using System;
 
 namespace TheWoods.Player
 {
+
     [RequireComponent(typeof(Controller2D))]
     public class PlayerController : MonoBehaviour
     {
 
-        #region Data
+        #region DataFields
         [Space(5)]
         [Header("Player Jump Settings")]
         public float jumpHeight = 4;
         public float timeToApex = .4f; //how long should the character take before he reacher the max height
         public float accelerationTimeAirborne;
         public float accelerationTimeGrounded;
+
         [Space(5)]
-        [Header("Player Move Settings")]
+        [Header("Player Movement Settings")]
         public float moveSpeed = 6;
         public bool canMove = true;
 
+        //Player physics settings
         #region Jump physics formula
         /*
         Known: jumpHeight, timeToJumpApex
@@ -54,16 +58,13 @@ namespace TheWoods.Player
         }
         float velocityXSmoothing;
 
-        //testing 
-        [HideInInspector]
-        public Vector2 input; //For audio event
-        Controller2D controller;
+        //Controller Input Settings 
+        Vector2 input; //horizontal/vertical inputs.
+        
+        //Collision Settings.
+        Controller2D controllerCollisions2D;
 
-
-
-        #endregion
-
-        #region Engine Functions
+        #endregion DataFields
 
         public static PlayerController Instance { get { return instance; } } //getter for instance
         static protected PlayerController instance; //declaring instance variable
@@ -73,7 +74,7 @@ namespace TheWoods.Player
             if (instance != null)
             {
                 Debug.LogWarning("There is alreade a player in play. Deleting old, instantiating new");
-                Destroy(PlayerController.Instance.gameObject);
+                Destroy(Player.PlayerController.Instance.gameObject);
                 instance = null;
             }
             else
@@ -85,31 +86,100 @@ namespace TheWoods.Player
         // Use this for initialization
         void Start()
         {
-            controller = GetComponent<Controller2D>();
+            //init 2D Collision Controller.
+            controllerCollisions2D = GetComponent<Controller2D>();
+
+            //physics set up.
             gravity = (-2 * jumpHeight) / Mathf.Pow(timeToApex, 2);
             jumpVelocity = Mathf.Abs(gravity * timeToApex);
-            print("Gravity: " + gravity + "Jump Velocity: " + jumpVelocity);
         }
+
+        void OnEnable()
+        {
+            Manager.InputManager.Instance.movementEvent += MobileMovementControls;
+
+            Manager.InputManager.Instance.attackEvent += MobileAttackControls;
+            Manager.InputManager.Instance.jumpEvent += MobileJumpControls;
+        }
+
+        void OnDisable()
+        {
+            Manager.InputManager.Instance.movementEvent -= MobileMovementControls;
+            Manager.InputManager.Instance.attackEvent -= MobileAttackControls;
+            Manager.InputManager.Instance.jumpEvent -= MobileJumpControls;
+        }
+
+        #region MobileControls
+
+        /// <summary>
+        /// Adds Input from mobile device to player movement.
+        /// </summary>
+        public void MobileMovementControls()
+        {
+            //Get Input from mobile controller.
+            Vector2 mobileInput = new Vector2(MobileController.HorizontalInput, MobileController.VerticalInput);
+
+            //Add input for the movement in player controller.
+            PlayerMovement(mobileInput);
+        }
+
+        /// <summary>
+        /// Player Attack Behaviour from mobile controls.
+        /// </summary>
+        public void MobileAttackControls()
+        {
+            throw new NotImplementedException();
+        }
+
+        /// <summary>
+        /// Player Jump Behaviour for mobile controls.
+        /// </summary>
+        public void MobileJumpControls()
+        {
+            throw new NotImplementedException();
+        }
+
+
+        #endregion MobileControls
+
+        #region Controller Physics Set-Up
+
+        /// <summary>
+        /// Given Horizontal and Vertical input we can move the player in that direction.
+        /// </summary>
+        /// <param name="input">Raw Input Data</param>
+        private void PlayerMovement(Vector2 input)
+        {
+            //Rotates the player obj based on direction
+            controllerCollisions2D.Direction(input); //PC and Mobile
+
+            float targetVelocityX = input.x * moveSpeed; //smooth movement on x axis
+            velocity.x = Mathf.SmoothDamp(velocity.x, targetVelocityX, ref velocityXSmoothing, (controllerCollisions2D.collisions.below) ? accelerationTimeGrounded : accelerationTimeAirborne);
+            velocity.y += gravity * Time.deltaTime;
+            controllerCollisions2D.Move(velocity * Time.deltaTime);
+        }
+
+        #endregion Controller Physics Set-Up
+
 
         void Update()
         {
             if (canMove)
             {
-                if (controller.collisions.above || controller.collisions.below)
+                if (controllerCollisions2D.collisions.above || controllerCollisions2D.collisions.below)
                 {
                     velocity.y = 0;
                 }
-                //Debug.Log ("Y velocity: " +velocity.y);
-                input = new Vector2(Input.GetAxisRaw("Horizontal"), Input.GetAxisRaw("Vertical"));
 
-                //Trigger Movement event
-                //Debug.Log("Input: " + input);
+                //PC
+                //input = new Vector2(Input.GetAxisRaw("Horizontal"), Input.GetAxisRaw("Vertical"));
 
-                //Rotates the player obj based on direction
-                controller.Direction(input);
-                controller.Attack();
-                controller.Invisibility();
+                //PC Controls
+                controllerCollisions2D.Attack();
+                controllerCollisions2D.Invisibility();
 
+                /*
+                //PC Controller
                 if (Input.GetKeyDown(KeyCode.Space) && controller.collisions.below)
                 {
                     velocity.y = jumpVelocity;
@@ -118,10 +188,9 @@ namespace TheWoods.Player
                 float targetVelocityX = input.x * moveSpeed; //smooth movement on x axis
                 velocity.x = Mathf.SmoothDamp(velocity.x, targetVelocityX, ref velocityXSmoothing, (controller.collisions.below) ? accelerationTimeGrounded : accelerationTimeAirborne);
                 velocity.y += gravity * Time.deltaTime;
-                controller.Move(velocity * Time.deltaTime);
+                controller.Move(velocity * Time.deltaTime);*/
             }
         }
-        #endregion
 
         #region Helper Functions
 
@@ -154,7 +223,7 @@ namespace TheWoods.Player
 
         public bool isPlayerFalling()
         {
-            if (!controller.collisions.below) //if there is no ground
+            if (!controllerCollisions2D.collisions.below) //if there is no ground
             {
                 return true;
             }
@@ -166,7 +235,7 @@ namespace TheWoods.Player
 
         public bool isPlayerGrounded()
         {
-            if (controller.collisions.below)
+            if (controllerCollisions2D.collisions.below)
             {
                 return true;
             }
@@ -178,7 +247,7 @@ namespace TheWoods.Player
 
         public bool isPlayerJumping()
         {
-            if (Input.GetKeyDown(KeyCode.Space) && controller.collisions.below)
+            if (Input.GetKeyDown(KeyCode.Space) && controllerCollisions2D.collisions.below)
             {
                 return true;
             }
@@ -187,6 +256,8 @@ namespace TheWoods.Player
                 return false;
             }
         }
+
+
         #endregion
     }
 }
