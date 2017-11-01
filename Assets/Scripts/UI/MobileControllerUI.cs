@@ -12,6 +12,7 @@ namespace TheWoods.UI
         {
             //Activate Movement Trigger.
             InputManager.Instance.MovementTrigger();
+            
         }
 
         public void OnJumpButton()

@@ -119,6 +119,8 @@ namespace TheWoods.Player
             //Get Input from mobile controller.
             Vector2 mobileInput = new Vector2(MobileController.HorizontalInput, MobileController.VerticalInput);
 
+            Debug.Log(mobileInput);
+
             //Add input for the movement in player controller.
             PlayerMovement(mobileInput);
         }

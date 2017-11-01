@@ -52,7 +52,7 @@ namespace TheWoods.Player
                     //Change origin to new position.
                     touchOrigin = myTouch.position;
                 }
-                else if (myTouch.phase == TouchPhase.Moved && touchOrigin.x >= 0) //if finger is lifted.
+                else if (myTouch.phase == TouchPhase.Moved) //if finger moves on the screen.
                 {
                     //Store the touch of when the finger was lifted.
                     Vector2 touchEnd = myTouch.position;
@@ -60,9 +60,6 @@ namespace TheWoods.Player
                     //Calculate the distance traveled in x direction.
                     float xDist = touchEnd.x - touchOrigin.x;
                     float yDist = touchEnd.y - touchOrigin.y;
-
-                    //restore touch to off screen default origin.
-                    touchOrigin.x = -1;
 
                     //Check if the swipe is more vertical or more horizontal.
                     if (IsSwipeHorizontal(xDist, yDist))
@@ -75,6 +72,14 @@ namespace TheWoods.Player
                         //User swiped vertical
                         verticalInput = yDist > 0 ? 1 : -1;
                     }
+                }
+                else if(myTouch.phase == TouchPhase.Ended)
+                {
+                    //When finger is lifted return to origin point.
+                    touchOrigin.x = -1;
+
+                    Debug.Log("Finger lifted");
+                    horizontalInput = verticalInput = 0; //return no input.
                 }
             }
         }
