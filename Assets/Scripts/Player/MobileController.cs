@@ -23,6 +23,9 @@ namespace TheWoods.Player
         private static int horizontalInput;
         private static int verticalInput;
 
+        //Lets me know if there has been a touch.
+        private bool hasTouchBegan;
+
         //Getters
         public static int HorizontalInput { get { return horizontalInput; } }
         public static int VerticalInput { get { return verticalInput; } }
@@ -32,6 +35,16 @@ namespace TheWoods.Player
             //Init input data.
             horizontalInput = verticalInput = 0;
             touchOrigin = -Vector2.one;
+        }
+
+        public static bool ScreenPressed()
+        {
+            return (Input.touchCount > 0);
+        }
+
+        public static void ZeroOutInputs()
+        {
+            horizontalInput = verticalInput = 0;
         }
 
         /// <summary>
@@ -48,7 +61,7 @@ namespace TheWoods.Player
 
                 //if the finger touched the screen.
                 if (myTouch.phase == TouchPhase.Began)
-                {
+                { 
                     //Change origin to new position.
                     touchOrigin = myTouch.position;
                 }
@@ -78,7 +91,6 @@ namespace TheWoods.Player
                     //When finger is lifted return to origin point.
                     touchOrigin.x = -1;
 
-                    Debug.Log("Finger lifted");
                     horizontalInput = verticalInput = 0; //return no input.
                 }
             }

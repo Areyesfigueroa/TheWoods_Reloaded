@@ -108,7 +108,6 @@ namespace TheWoods.AI
                         {
                             isVisible = true;
                             runOnce = false;
-                            Debug.Log("Visible: " + isVisible);
                             AudioEventSystem.EnemyAlert();
                         }
                         visibleTargets.Add(target);

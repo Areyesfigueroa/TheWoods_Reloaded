@@ -64,6 +64,7 @@ namespace TheWoods.Player
         //Collision Settings.
         Controller2D controllerCollisions2D;
 
+
         #endregion DataFields
 
         public static PlayerController Instance { get { return instance; } } //getter for instance
@@ -110,19 +111,14 @@ namespace TheWoods.Player
         }
 
         #region MobileControls
-
+        //Updates every frame
         /// <summary>
-        /// Adds Input from mobile device to player movement.
+        /// When User presses the mobile joystick button.
         /// </summary>
         public void MobileMovementControls()
         {
-            //Get Input from mobile controller.
-            Vector2 mobileInput = new Vector2(MobileController.HorizontalInput, MobileController.VerticalInput);
-
-            Debug.Log(mobileInput);
-
             //Add input for the movement in player controller.
-            PlayerMovement(mobileInput);
+            PlayerInputMovement(new Vector2(MobileController.HorizontalInput, MobileController.VerticalInput));
         }
 
         /// <summary>
@@ -134,11 +130,16 @@ namespace TheWoods.Player
         }
 
         /// <summary>
-        /// Player Jump Behaviour for mobile controls.
+        /// Player Jump Behaviour when user presses jump button.
         /// </summary>
         public void MobileJumpControls()
         {
-            throw new NotImplementedException();
+            if (controllerCollisions2D.collisions.below && MobileController.ScreenPressed())
+            {
+                velocity.y = jumpVelocity;
+            }
+
+            PlayerPhysicsMovement();
         }
 
 
@@ -148,16 +149,25 @@ namespace TheWoods.Player
 
         /// <summary>
         /// Given Horizontal and Vertical input we can move the player in that direction.
+        /// Updates when user presses button.
         /// </summary>
         /// <param name="input">Raw Input Data</param>
-        private void PlayerMovement(Vector2 input)
+        public void PlayerInputMovement(Vector2 input)
         {
-            //Rotates the player obj based on direction
-            controllerCollisions2D.Direction(input); //PC and Mobile
+            controllerCollisions2D.Direction(input);
 
+            //Speed x axis calculation.
             float targetVelocityX = input.x * moveSpeed; //smooth movement on x axis
             velocity.x = Mathf.SmoothDamp(velocity.x, targetVelocityX, ref velocityXSmoothing, (controllerCollisions2D.collisions.below) ? accelerationTimeGrounded : accelerationTimeAirborne);
+        }
+
+        //Always Updating
+        private void PlayerPhysicsMovement()
+        {
+            //Y-axis movement calculation. //gravity.
             velocity.y += gravity * Time.deltaTime;
+
+            //controller movement.
             controllerCollisions2D.Move(velocity * Time.deltaTime);
         }
 
@@ -180,17 +190,8 @@ namespace TheWoods.Player
                 controllerCollisions2D.Attack();
                 controllerCollisions2D.Invisibility();
 
-                /*
-                //PC Controller
-                if (Input.GetKeyDown(KeyCode.Space) && controller.collisions.below)
-                {
-                    velocity.y = jumpVelocity;
-                }
-
-                float targetVelocityX = input.x * moveSpeed; //smooth movement on x axis
-                velocity.x = Mathf.SmoothDamp(velocity.x, targetVelocityX, ref velocityXSmoothing, (controller.collisions.below) ? accelerationTimeGrounded : accelerationTimeAirborne);
-                velocity.y += gravity * Time.deltaTime;
-                controller.Move(velocity * Time.deltaTime);*/
+                //No input from user required.
+                PlayerPhysicsMovement();
             }
         }
 
